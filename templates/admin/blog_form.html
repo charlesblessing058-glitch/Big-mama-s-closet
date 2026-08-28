@@ -1,0 +1,32 @@
+﻿{% extends "admin/base.html" %}
+{% block admin_content %}
+<h2 class="fw-bold mb-4">{% if post %}Edit{% else %}Add{% endif %} Blog Post</h2>
+<div class="card p-4">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Post Title</label>
+            <input type="text" name="title" class="form-control" value="{{ post.title if post else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Author Name</label>
+            <input type="text" name="author" class="form-control" value="{{ post.author if post else 'Big Mama's Closet' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Content</label>
+            <textarea name="content" class="form-control" rows="10" required>{{ post.content if post else '' }}</textarea>
+            <small class="text-muted">You can use HTML tags for formatting</small>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Featured Image</label>
+            <input type="file" name="image_file" class="form-control" accept="image/*">
+            {% if post and post.image_url %}
+            <div class="mt-2"><img src="{{ post.image_url }}" width="100" class="rounded"></div>
+            {% endif %}
+            <small class="text-muted">Or paste an image URL:</small>
+            <input type="text" name="image_url" class="form-control mt-1" value="{{ post.image_url if post and 'http' in post.image_url else '' }}" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn btn-brand px-5 py-2 fw-bold">Save Post</button>
+        <a href="{{ url_for('admin_blog') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

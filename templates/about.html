@@ -1,0 +1,15 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm p-5 text-center">
+            <h1 class="display-4 fw-bold text-brand mb-4">About Big Mama's Closet</h1>
+            <img src="{{ url_for('static', filename=settings.logo_filename if settings.logo_filename else 'logo.png') }}" alt="Logo" class="mx-auto mb-4" style="max-height: 150px;" onerror="this.style.display='none'">
+            <p class="lead text-muted">{{ settings.about_text }}</p>
+            <hr class="my-4">
+            <p>We are dedicated to bringing you the finest fashion, beauty, and accessories. Thank you for shopping with us!</p>
+            <a href="{{ url_for('home') }}" class="btn btn-brand btn-lg mt-3">Back to Shopping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

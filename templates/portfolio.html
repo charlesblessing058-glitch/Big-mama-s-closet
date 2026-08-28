@@ -1,0 +1,28 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<h1 class="display-4 fw-bold text-center mb-4">Our Portfolio</h1>
+<p class="text-center text-muted mb-5">Showcasing our best work, happy customers, and memorable moments</p>
+
+<div class="row">
+    {% for item in items %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden">
+            <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title }}" style="height: 300px; object-fit: cover;">
+            <div class="card-body">
+                <span class="badge bg-brand mb-2">{{ item.category }}</span>
+                <h5 class="card-title fw-bold">{{ item.title }}</h5>
+                <p class="card-text text-muted">{{ item.description }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 text-muted small">
+                <i class="fas fa-calendar me-1"></i> {{ item.created_at[:10] }}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-images fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">Portfolio coming soon. Check back later!</h4>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

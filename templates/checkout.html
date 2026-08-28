@@ -1,0 +1,25 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm p-5 text-center">
+            <i class="fas fa-phone-alt fa-4x text-brand mb-4"></i>
+            <h2 class="fw-bold mb-4">Complete Your Order</h2>
+            <p class="lead text-muted mb-4">To place your order, please call us directly at:</p>
+            <h1 class="display-3 fw-bold text-brand mb-4">{{ settings.contact_phone }}</h1>
+            <div class="alert alert-info">
+                <h5 class="fw-bold">How it works:</h5>
+                <ol class="text-start">
+                    <li>Call us at the number above</li>
+                    <li>Tell us the items you want to order</li>
+                    <li>We'll confirm availability and arrange delivery</li>
+                    <li>Payment can be made via M-Pesa or cash on delivery</li>
+                </ol>
+            </div>
+            <p class="text-muted">Our team is ready to help you complete your purchase!</p>
+            <a href="{{ url_for('cart') }}" class="btn btn-outline-secondary btn-lg me-2">Back to Bag</a>
+            <a href="{{ url_for('home') }}" class="btn btn-brand btn-lg">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

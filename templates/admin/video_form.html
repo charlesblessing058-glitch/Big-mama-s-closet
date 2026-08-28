@@ -1,0 +1,28 @@
+﻿{% extends "admin/base.html" %}
+{% block admin_content %}
+<h2 class="fw-bold mb-4">{% if video %}Edit{% else %}Add{% endif %} Video</h2>
+<div class="card p-4">
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Video Title</label>
+            <input type="text" name="title" class="form-control" value="{{ video.title if video else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" required>{{ video.description if video else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Video URL</label>
+            <input type="text" name="video_url" class="form-control" value="{{ video.video_url if video else '' }}" placeholder="https://youtube.com/watch?v=... or direct video file URL" required>
+            <small class="text-muted">Paste YouTube link or direct video file URL</small>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Thumbnail URL (Optional)</label>
+            <input type="text" name="thumbnail_url" class="form-control" value="{{ video.thumbnail_url if video else '' }}" placeholder="https://...">
+            <small class="text-muted">Custom thumbnail image URL</small>
+        </div>
+        <button type="submit" class="btn btn-brand px-5 py-2 fw-bold">Save Video</button>
+        <a href="{{ url_for('admin_videos') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

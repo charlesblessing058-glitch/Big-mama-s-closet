@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Mama's Closet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --brand-pink: #ff3366; --brand-black: #111111; }
+        body { background-color: #fafafa; font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
+        .navbar-brand { font-family: 'Georgia', serif; letter-spacing: 1px; }
+        .navbar-brand img { height: 40px; }
+        .bg-brand { background-color: var(--brand-black) !important; }
+        .btn-brand { background-color: var(--brand-pink); color: white; border: none; font-weight: 600; }
+        .btn-brand:hover { background-color: #e62e5c; color: white; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: 0.3s; }
+        .category-btn { border: 1px solid #ddd; border-radius: 20px; padding: 6px 18px; margin: 5px; text-decoration: none; color: #555; transition: 0.2s; }
+        .category-btn.active, .category-btn:hover { background-color: var(--brand-pink); color: white; border-color: var(--brand-pink); }
+        .hero-banner { background: linear-gradient(135deg, #111111 0%, #ff3366 100%); color: white; padding: 70px 0; border-radius: 15px; margin-bottom: 30px;}
+        .text-brand { color: var(--brand-pink) !important; }
+        .notification-bar { background-color: var(--brand-pink); color: white; text-align: center; padding: 8px; font-size: 0.9rem; }
+        .original-price { text-decoration: line-through; color: #999; font-size: 0.9rem; margin-right: 8px; }
+        .current-price { color: var(--brand-pink); font-weight: bold; font-size: 1.2rem; }
+        
+        /* Floating Call Button */
+        .floating-call-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--brand-pink);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+            text-decoration: none;
+        }
+        .floating-call-btn:hover {
+            background-color: #e62e5c;
+            color: white;
+            transform: scale(1.1);
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 51, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
+        }
+        .call-btn-label {
+            position: fixed;
+            bottom: 25px;
+            right: 90px;
+            background-color: var(--brand-black);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .call-btn-label { display: block; }
+        }
+    </style>
+</head>
+<body>
+    {% if settings and settings.notification_text %}
+    <div class="notification-bar">
+        <i class="fas fa-bullhorn me-2"></i> {{ settings.notification_text }}
+    </div>
+    {% endif %}
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-brand sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename=settings.logo_filename if settings and settings.logo_filename else 'logo.png') }}" alt="Logo" class="me-2" onerror="this.style.display='none'"> Big Mama's Closet
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="d-flex mx-auto w-50" role="search" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search products..." aria-label="Search" value="{{ search_query if search_query else '' }}">
+                    <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('blog') }}">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('videos') }}">Videos</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('portfolio') }}">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('about') }}">About</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('contact') }}">Contact</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link text-white fw-bold" href="{{ url_for('cart') }}"><i class="fas fa-shopping-bag"></i> Bag <span class="badge bg-danger rounded-pill">{{ session.get('cart', {}) | length }}</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+    </div>
+    
+    <main class="container my-4">{% block content %}{% endblock %}</main>
+    
+    <footer class="bg-brand text-white text-center py-5 mt-5">
+        <div class="container">
+            <h5 class="fw-bold mb-3">Big Mama's Closet</h5>
+            <p class="small text-white-50">&copy; 2026 Big Mama's Closet. All Rights Reserved.</p>
+            <div class="mt-3">
+                <a href="{{ url_for('contact') }}" class="text-white mx-2"><i class="fas fa-phone fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-whatsapp fa-lg"></i></a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Floating Call Button -->
+    <a href="tel:{{ settings.contact_phone if settings else '+254700000000' }}" class="floating-call-btn" title="Call us now">
+        <i class="fas fa-phone"></i>
+    </a>
+    <div class="call-btn-label">Call Us Now</div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="card border-0 shadow-sm p-4">
+    <div class="row g-5">
+        <div class="col-md-5 text-center">
+            <img src="{{ product.image_url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        </div>
+        <div class="col-md-7">
+            <span class="badge bg-secondary mb-2">{{ product.category }}</span>
+            <h2 class="fw-bold">{{ product.name }}</h2>
+            <div class="my-3">
+                {% if product.original_price > product.price %}
+                    <span class="original-price fs-4">KES {{ "{:,.0f}".format(product.original_price) }}</span>
+                {% endif %}
+                <span class="current-price fs-2">KES {{ "{:,.0f}".format(product.price) }}</span>
+            </div>
+            <p class="text-muted">{{ product.description }}</p>
+            <p class="text-success"><i class="fas fa-check-circle"></i> In Stock ({{ product.stock }} available)</p>
+            {% if product.sold > 0 %}
+            <p class="text-muted small"><i class="fas fa-fire text-brand"></i> {{ product.sold }} sold</p>
+            {% endif %}
+            <hr>
+            <a href="{{ url_for('add_to_cart', product_id=product.id) }}" class="btn btn-brand btn-lg w-100"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg w-100 mt-2">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

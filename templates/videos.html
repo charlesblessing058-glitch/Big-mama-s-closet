@@ -1,0 +1,39 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<h1 class="display-4 fw-bold text-center mb-4">Video Gallery</h1>
+<p class="text-center text-muted mb-5">Watch our latest product showcases, fashion tips, and behind-the-scenes content</p>
+
+<div class="row">
+    {% for video in videos %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            {% if video.thumbnail_url %}
+            <img src="{{ video.thumbnail_url }}" class="card-img-top" alt="{{ video.title }}" style="height: 220px; object-fit: cover;">
+            <div class="position-absolute top-50 start-50 translate-middle">
+                <i class="fas fa-play-circle fa-4x text-white" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);"></i>
+            </div>
+            {% else %}
+            <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 220px;">
+                <i class="fas fa-play-circle fa-5x text-white"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ video.title }}</h5>
+                <p class="card-text text-muted small">{{ video.description[:100] }}...</p>
+                <a href="{{ video.video_url }}" target="_blank" class="btn btn-brand btn-sm">
+                    <i class="fas fa-play me-1"></i> Watch Video
+                </a>
+            </div>
+            <div class="card-footer bg-white border-0 text-muted small">
+                <i class="fas fa-calendar me-1"></i> {{ video.created_at[:10] }}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-video fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No videos yet. Stay tuned!</h4>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

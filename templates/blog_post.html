@@ -1,0 +1,37 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <article class="card border-0 shadow-sm">
+            <img src="{{ post.image_url }}" class="card-img-top" alt="{{ post.title }}" style="max-height: 400px; object-fit: cover;">
+            <div class="card-body p-5">
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-calendar me-2"></i> {{ post.created_at[:10] }}
+                    <span class="mx-2">|</span>
+                    <i class="fas fa-user me-2"></i> {{ post.author }}
+                    <span class="mx-2">|</span>
+                    <i class="fas fa-eye me-2"></i> {{ post.views }} views
+                </div>
+                <h1 class="display-5 fw-bold mb-4">{{ post.title }}</h1>
+                <div class="content">
+                    {{ post.content | safe }}
+                </div>
+                <hr class="my-5">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('blog') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Blog
+                    </a>
+                    <div>
+                        <a href="https://facebook.com/sharer/sharer.php?u={{ request.url }}" class="btn btn-brand btn-sm me-2" target="_blank">
+                            <i class="fab fa-facebook"></i> Share
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}" class="btn btn-brand btn-sm" target="_blank">
+                            <i class="fab fa-twitter"></i> Tweet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+{% endblock %}

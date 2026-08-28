@@ -1,0 +1,31 @@
+﻿{% extends "admin/base.html" %}
+{% block admin_content %}
+<h2 class="fw-bold mb-4">{% if item %}Edit{% else %}Add{% endif %} Portfolio Item</h2>
+<div class="card p-4">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" value="{{ item.title if item else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <input type="text" name="category" class="form-control" value="{{ item.category if item else 'Customer Photo' }}" placeholder="e.g., Customer Photo, Event, Product Launch" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" required>{{ item.description if item else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Image</label>
+            <input type="file" name="image_file" class="form-control" accept="image/*" required>
+            {% if item and item.image_url %}
+            <div class="mt-2"><img src="{{ item.image_url }}" width="150" class="rounded"></div>
+            {% endif %}
+            <small class="text-muted">Or paste an image URL:</small>
+            <input type="text" name="image_url" class="form-control mt-1" value="{{ item.image_url if item and 'http' in item.image_url else '' }}" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn btn-brand px-5 py-2 fw-bold">Save Item</button>
+        <a href="{{ url_for('admin_portfolio') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}
