@@ -223,9 +223,65 @@ def admin_dashboard():
 
 @app.route('/admin/products')
 @login_required
-def admin_products():
-    products = db_query('SELECT * FROM products')
-    return render_template('admin/products.html', products=products)
+]@app.route('/admin/products/add', methods=['GET', 'POST'])
+@login_required
+def add_product():
+    if request.method == 'POST':
+        name = request.form['name']
+        # Convert text to actual numbers for PostgreSQL
+        price = float(request.form['price'])
+        original_price = float(request.form.get('original_price') or price)
+        category = request.form['category']
+        description = request.form['description']
+        stock = int(request.form['stock'])
+        image_url = request.form.get('image_url', '')
+        
+        # Create the uploads folder if it doesn't exist
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        
+        if 'image_file' in request.files and request.files['image_file'].filename != '':
+            file = request.files['image_file']
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image_url = url_for('static', filename=f'uploads/{filename}')
+        elif not image_url:
+            image_url = 'https://via.placeholder.com/300?text=No+Image'
+
+        db_execute('INSERT INTO products (name, price, original_price, category, description, stock, image_url, sold) VALUES (%s, %s, %s, %s, %s, %s, %s, 0)' if USE_POSTGRES else 'INSERT INTO products (name, price, original_price, category, description, stock, image_url, sold) VALUES (?, ?, ?, ?, ?, ?, ?, 0)', (name, price, original_price, category, description, stock, image_url))
+        flash('Product added successfully!', 'success')
+        return redirect(url_for('admin_products'))
+    
+    categories = [row['name'] for row in db_query('SELECT * FROM categories ORDER BY name')]
+    return render_template('admin/product_form.html', product=None, categories=categories)
+
+@app.route('/admin/products/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_product(id):
+    product = db_fetch_one('SELECT * FROM products WHERE id = %s' if USE_POSTGRES else 'SELECT * FROM products WHERE id = ?', (id,))
+    if request.method == 'POST':
+        name = request.form['name']
+        price = float(request.form['price'])
+        original_price = float(request.form.get('original_price') or price)
+        category = request.form['category']
+        description = request.form['description']
+        stock = int(request.form['stock'])
+        sold = int(request.form.get('sold', 0))
+        image_url = product['image_url']
+        
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        
+        if 'image_file' in request.files and request.files['image_file'].filename != '':
+            file = request.files['image_file']
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image_url = url_for('static', filename=f'uploads/{filename}')
+
+        db_execute('UPDATE products SET name=%s, price=%s, original_price=%s, category=%s, description=%s, stock=%s, sold=%s, image_url=%s WHERE id=%s' if USE_POSTGRES else 'UPDATE products SET name=?, price=?, original_price=?, category=?, description=?, stock=?, sold=?, image_url=? WHERE id=?', (name, price, original_price, category, description, stock, sold, image_url, id))
+        flash('Product updated!', 'success')
+        return redirect(url_for('admin_products'))
+    
+    categories = [row['name'] for row in db_query('SELECT * FROM categories ORDER BY name')]
+    return render_template('admin/product_form.html', product=product, categories=categories)
 
 @app.route('/admin/categories')
 @login_required
