@@ -464,6 +464,8 @@ def admin_settings():
         return redirect(url_for('admin_settings'))
     return render_template('admin/settings.html', settings=get_settings())
 
+# Initialize the database when the app starts (works for both local and gunicorn)
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True, port=5000)
