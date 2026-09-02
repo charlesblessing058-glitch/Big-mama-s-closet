@@ -20,16 +20,21 @@
             </div>
         </div>
 
-        <div class="row">
+          <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Category</label>
                 <select name="category" class="form-select" required>
                     <option value="">Select Category</option>
                     {% for cat in categories %}
-                    <option value="{{ cat.name }}" {% if product and product.category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                    <option value="{{ cat }}" {% if product and product.category == cat %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
                 </select>
             </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Stock Quantity</label>
+                <input type="number" name="stock" class="form-control" value="{{ product.stock if product else '0' }}" required>
+            </div>
+        </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Stock Quantity</label>
                 <input type="number" name="stock" class="form-control" value="{{ product.stock if product else '0' }}" required>
