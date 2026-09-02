@@ -34,7 +34,7 @@
                         {% endif %}
                         <span class="current-price">KES {{ "{:,.0f}".format(product.price) }}</span>
                     </div>
-                    <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-dark btn-sm mb-2">View Details</a>
+                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 300px; object-fit: cover;">
                     <a href="{{ url_for('add_to_cart', product_id=product.id) }}" class="btn btn-brand btn-sm"><i class="fas fa-shopping-bag me-1"></i> Add to Bag</a>
                 </div>
             </div>
