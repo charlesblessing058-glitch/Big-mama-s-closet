@@ -404,7 +404,8 @@ def add_product():
         category = request.form['category']
         description = request.form['description']
         stock = int(request.form['stock'])
-        image_url = request.form.get('image_url', '')
+        # THIS FIXES THE DISAPPEARING LINK
+        image_url = request.form.get('image_url', '').strip()
         
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         
@@ -435,7 +436,8 @@ def edit_product(id):
         description = request.form['description']
         stock = int(request.form['stock'])
         sold = int(request.form.get('sold', 0))
-        image_url = request.form.get('image_url', '')
+        # THIS FIXES THE DISAPPEARING LINK
+        image_url = request.form.get('image_url', '').strip()
         
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         
