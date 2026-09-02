@@ -73,7 +73,7 @@ def init_db():
             db_execute('INSERT INTO admins (username, password) VALUES (%s, %s)', ('admin', 'bigmama123'))
         if db_fetch_one('SELECT COUNT(*) FROM settings')[0] == 0:
             db_execute('INSERT INTO settings (id, logo_filename, about_text, notification_text, contact_phone, contact_email, contact_address) VALUES (1, %s, %s, %s, %s, %s, %s)', 
-                       ('logo.png', 'Welcome to Big Mama\'s Closet. We provide the finest fashion, beauty, and accessories in Kenya.', 'Free delivery on orders over KES 5,000!', '+254 700 000 000', 'info@bigmamascloset.co.ke', 'Nairobi, Kenya'))
+                       ('logo.png', 'Welcome to Big Mama\'s Closet.', 'Free delivery on orders over KES 5,000!', '+254 700 000 000', 'info@bigmamascloset.co.ke', 'Nairobi, Kenya'))
         if db_fetch_one('SELECT COUNT(*) FROM categories')[0] == 0:
             for cat in ['Ladies Clothes', 'Men Clothes', 'Handbags', 'Shoes', 'Jewelry', 'Beauty']:
                 try: db_execute('INSERT INTO categories (name) VALUES (%s)', (cat,))
@@ -91,12 +91,12 @@ def init_db():
             db_execute('INSERT INTO admins (username, password) VALUES (?, ?)', ('admin', 'bigmama123'))
         if db_fetch_one('SELECT COUNT(*) FROM settings')[0] == 0:
             db_execute('INSERT INTO settings (id, logo_filename, about_text, notification_text, contact_phone, contact_email, contact_address) VALUES (1, ?, ?, ?, ?, ?, ?)', 
-                       ('logo.png', 'Welcome to Big Mama\'s Closet. We provide the finest fashion, beauty, and accessories in Kenya.', 'Free delivery on orders over KES 5,000!', '+254 700 000 000', 'info@bigmamascloset.co.ke', 'Nairobi, Kenya'))
+                       ('logo.png', 'Welcome to Big Mama\'s Closet.', 'Free delivery on orders over KES 5,000!', '+254 700 000 000', 'info@bigmamascloset.co.ke', 'Nairobi, Kenya'))
         if db_fetch_one('SELECT COUNT(*) FROM categories')[0] == 0:
             for cat in ['Ladies Clothes', 'Men Clothes', 'Handbags', 'Shoes', 'Jewelry', 'Beauty']:
                 db_execute('INSERT INTO categories (name) VALUES (?)', (cat,))
 
-# Initialize the database when the app starts (works for both local and gunicorn)
+# Initialize the database when the app starts
 init_db()
 
 def login_required(f):
@@ -223,35 +223,12 @@ def admin_dashboard():
     total_posts = db_fetch_one('SELECT COUNT(*) FROM blog_posts')[0]
     total_videos = db_fetch_one('SELECT COUNT(*) FROM videos')[0]
     return render_template('admin/dashboard.html', total_products=total_products, total_sold=total_sold, total_revenue=total_revenue, total_posts=total_posts, total_videos=total_videos)
-@app.route('/admin/products/add', methods=['GET', 'POST'])
-@login_required
-def add_product():
-    if request.method == 'POST':
-        name = request.form['name']
-        price = float(request.form['price'])
-        original_price = float(request.form.get('original_price') or price)
-        category = request.form['category']
-        description = request.form['description']
-        stock = int(request.form['stock'])
-        # THIS IS THE CRITICAL LINE - make sure it's here:
-        image_url = request.form.get('image_url', '')
-        
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        
-        if 'image_file' in request.files and request.files['image_file'].filename != '':
-            file = request.files['image_file']
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_url = url_for('static', filename=f'uploads/{filename}')
-        elif not image_url:
-            image_url = 'https://via.placeholder.com/300?text=No+Image'
 
-        db_execute('INSERT INTO products (name, price, original_price, category, description, stock, image_url, sold) VALUES (%s, %s, %s, %s, %s, %s, %s, 0)' if USE_POSTGRES else 'INSERT INTO products (name, price, original_price, category, description, stock, image_url, sold) VALUES (?, ?, ?, ?, ?, ?, ?, 0)', (name, price, original_price, category, description, stock, image_url))
-        flash('Product added successfully!', 'success')
-        return redirect(url_for('admin_products'))
-    
-    categories = [row['name'] for row in db_query('SELECT * FROM categories ORDER BY name')]
-    return render_template('admin/product_form.html', product=None, categories=categories)
+@app.route('/admin/products')
+@login_required
+def admin_products():
+    products = db_query('SELECT * FROM products')
+    return render_template('admin/products.html', products=products)
 
 @app.route('/admin/categories')
 @login_required
@@ -422,7 +399,6 @@ def delete_portfolio_item(id):
 def add_product():
     if request.method == 'POST':
         name = request.form['name']
-        # Convert text to actual numbers for PostgreSQL
         price = float(request.form['price'])
         original_price = float(request.form.get('original_price') or price)
         category = request.form['category']
@@ -430,7 +406,6 @@ def add_product():
         stock = int(request.form['stock'])
         image_url = request.form.get('image_url', '')
         
-        # Create the uploads folder if it doesn't exist
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         
         if 'image_file' in request.files and request.files['image_file'].filename != '':
@@ -460,7 +435,7 @@ def edit_product(id):
         description = request.form['description']
         stock = int(request.form['stock'])
         sold = int(request.form.get('sold', 0))
-        image_url = product['image_url']
+        image_url = request.form.get('image_url', '')
         
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         
@@ -469,6 +444,8 @@ def edit_product(id):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             image_url = url_for('static', filename=f'uploads/{filename}')
+        elif not image_url:
+            image_url = product['image_url']
 
         db_execute('UPDATE products SET name=%s, price=%s, original_price=%s, category=%s, description=%s, stock=%s, sold=%s, image_url=%s WHERE id=%s' if USE_POSTGRES else 'UPDATE products SET name=?, price=?, original_price=?, category=?, description=?, stock=?, sold=?, image_url=? WHERE id=?', (name, price, original_price, category, description, stock, sold, image_url, id))
         flash('Product updated!', 'success')
